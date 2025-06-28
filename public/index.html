@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>المنصة التعليمية</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #f9fafb; }
+    .thread-card { transition: 0.3s; }
+    .thread-card:hover { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .read-more-btn, .read-less-btn { cursor: pointer; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-l from-blue-600 to-cyan-500 text-white py-4 shadow-lg">
+    <div class="container text-center">
+      <h1 class="text-3xl font-bold mb-2">📘 المنصة التعليمية</h1>
+      <nav class="flex flex-wrap justify-center gap-4 text-sm">
+        <a href="#" onclick="showSection('home')" class="hover:underline">🏠 الرئيسية</a>
+        <a href="#" onclick="showSection('topics')" class="hover:underline">📚 المواضيع</a>
+        <a href="#" onclick="showSection('about')" class="hover:underline">ℹ️ عن المنصة</a>
+        <a href="#" onclick="showSection('contact')" class="hover:underline">📞 اتصل بنا</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Search Bar -->
+  <section class="bg-sky-100 py-4 shadow-md">
+    <div class="container">
+      <p class="mb-3 text-center text-lg">مناهج سلطنة عمان – العام الدراسي 2025. بحث حسب النوع:</p>
+      <div class="row g-2 justify-content-center align-items-center">
+        <div class="col-6 col-md-2">
+          <select id="search-class" class="form-select form-select-sm"></select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select id="search-material" class="form-select form-select-sm"></select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select id="search-semester" class="form-select form-select-sm"></select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select id="search-stage" class="form-select form-select-sm"></select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select id="search-type" class="form-select form-select-sm">
+            <option value="">نوع المحتوى</option>
+            <option value="pdf">📄 PDF</option>
+            <option value="image">🖼️ صورة</option>
+            <option value="video">🎥 فيديو</option>
+            <option value="doc">📄 Word</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-1">
+          <button class="btn btn-primary w-100 btn-sm" onclick="performSearch()">بحث</button>
+        </div>
+        <div class="col-6 col-md-1">
+          <button class="btn btn-secondary w-100 btn-sm" onclick="window.location.reload()">🔄</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Content Sections -->
+  <main class="container my-5 flex-grow">
+    <!-- Home Section -->
+    <section id="home">
+      <h3 class="text-xl font-bold mb-3">🆕 أحدث المواضيع</h3>
+      <div id="latest-threads" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"></div>
+      <nav id="pagination" class="mt-4"></nav>
+    </section>
+
+    <!-- Topics, About, Contact Sections -->
+    <section id="topics" class="hidden">
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="text-xl font-bold mb-3">📚 جميع المواضيع</h3>
+        <p>سيتم عرض جميع المواضيع هنا حسب الترتيب أو التصنيف.</p>
+      </div>
+    </section>
+    <section id="about" class="hidden">
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="text-xl font-bold mb-3">ℹ️ عن المنصة</h3>
+        <p>نحن منصة تعليمية تهدف لتسهيل الوصول إلى التعليم الرقمي في سلطنة عمان.</p>
+      </div>
+    </section>
+    <section id="contact" class="hidden">
+      <div class="bg-white p-4 rounded shadow">
+        <h3 class="text-xl font-bold mb-3">📞 اتصل بنا</h3>
+        <p>البريد: example@example.com | الهاتف: 99999999</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white text-center py-3">
+    <p>© 2025 جميع الحقوق محفوظة - المنصة التعليمية</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // --- Section Navigation ---
+    function showSection(id) {
+      ['home','topics','about','contact'].forEach(s => 
+        document.getElementById(s).classList.toggle('hidden', s !== id));
+    }
+
+    // --- Truncation ---
+    function applyTruncation() {
+      document.querySelectorAll('.thread-body').forEach(el => {
+        const full = el.innerText;
+        if (full.length > 200) {
+          el.setAttribute('data-full', full);
+          el.innerHTML = `${full.slice(0,200)}... <span class="read-more-btn text-blue-600">اقرأ المزيد</span>`;
+          el.querySelector('.read-more-btn').onclick = () => {
+            el.innerHTML = full + ' <span class="read-less-btn text-red-600">عرض أقل</span>';
+            el.querySelector('.read-less-btn').onclick = () => applyTruncation();
+          };
+        }
+      });
+    }
+
+    // --- Pagination & Display Fetch ---
+    let currentPage = 1;
+    function loadLatest(page=1) {
+      fetch(`load_public_threads.php?page=${page}`)
+        .then(r => r.text())
+        .then(html => {
+          document.getElementById('latest-threads').innerHTML = html;
+          applyTruncation();
+        });
+    }
+
+    // --- Search logic ---
+    function performSearch() {
+      const c = document.getElementById('search-class').value;
+      const m = document.getElementById('search-material').value;
+      const s = document.getElementById('search-semester').value;
+      const g = document.getElementById('search-stage').value;
+      const t = document.getElementById('search-type').value;
+      showSection('home');
+      fetch(`search_threads.php?class_id=${c}&material_id=${m}&semester_id=${s}&group_id=${g}&type=${t}`)
+        .then(r => r.text())
+        .then(html => {
+          document.getElementById('latest-threads').innerHTML = html;
+          applyTruncation();
+        });
+    }
+
+    // --- Load dropdown options dynamically ---
+    function loadFilterOptions() {
+      const base = '../api/';
+      fetch(base+'classes.php').then(r=>r.json()).then(data=>{
+        const sel = document.getElementById('search-class');
+        sel.innerHTML = '<option value="">الصف الدراسي</option>';
+        data.forEach(o=> sel.innerHTML += `<option value="${o.id}">${o.name}</option>`);
+      });
+      fetch(base+'materials.php').then(r=>r.json()).then(data=>{
+        const sel = document.getElementById('search-material');
+        sel.innerHTML = '<option value="">المادة</option>';
+        data.forEach(o=> sel.innerHTML += `<option value="${o.id}">${o.name}</option>`);
+      });
+      fetch(base+'semesters.php').then(r=>r.json()).then(data=>{
+        const sel = document.getElementById('search-semester');
+        sel.innerHTML = '<option value="">الفصل الدراسي</option>';
+        data.forEach(o=> sel.innerHTML += `<option value="${o.id}">${o.name}</option>`);
+      });
+      fetch(base+'groups.php').then(r=>r.json()).then(data=>{
+        const sel = document.getElementById('search-stage');
+        sel.innerHTML = '<option value="">المجموعة</option>';
+        data.forEach(o=> sel.innerHTML += `<option value="${o.id}">${o.name}</option>`);
+      });
+    }
+
+    // --- Initialize Everything ---
+    window.onload = () => {
+      loadFilterOptions();
+      loadLatest();
+    };
+  </script>
+</body>
+</html>
